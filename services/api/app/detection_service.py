@@ -11,7 +11,7 @@ def run_detection(db: Session) -> int:
     features = aggregate_events(events)
     flagged = score_windows(features)
     for item, score in flagged:
-        start = item.window_start.astimezone(UTC).replace(tzinfo=None)
+        start = item.window_start.astimezone(UTC)
         alert = db.query(AnomalyAlert).filter(
             AnomalyAlert.source_ip == item.source_ip,
             AnomalyAlert.window_start == start,
@@ -46,8 +46,8 @@ def run_detection(db: Session) -> int:
     return len(flagged)
 
 
-def simulate_events() -> list[LogEvent]:
-    now = datetime.now(UTC).replace(second=0, microsecond=0)
+def simulate_events(current_time: datetime | None = None) -> list[LogEvent]:
+    now = (current_time or datetime.now(UTC)).astimezone(UTC).replace(second=0, microsecond=0)
     events: list[LogEvent] = []
     for minute_offset in range(14, 0, -1):
         window = now - timedelta(minutes=minute_offset)

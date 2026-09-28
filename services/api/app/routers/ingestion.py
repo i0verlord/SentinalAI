@@ -7,6 +7,7 @@ from app.config import settings
 from app.database import get_db
 from app.detection_service import run_detection, simulate_events
 from app.ingestion import parse_line
+from app.models import LogEvent
 from app.schemas import IngestionResult, SimulationResult
 
 router = APIRouter(prefix="/ingestion", tags=["ingestion"])
@@ -32,7 +33,13 @@ async def upload_logs(
 
 @router.post("/simulate", response_model=SimulationResult)
 def simulate(db: Session = Depends(get_db)) -> SimulationResult:
-    events = simulate_events()
+    generated = simulate_events()
+    existing = {
+        row[0] for row in db.query(LogEvent.raw_line)
+        .filter(LogEvent.raw_line.in_([event.raw_line for event in generated]))
+        .all()
+    }
+    events = [event for event in generated if event.raw_line not in existing]
     db.add_all(events)
     db.commit()
     flagged = run_detection(db)

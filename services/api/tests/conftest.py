@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.database import Base, get_db
-import app.main as main
+from app.main import app
 
 
 @pytest.fixture
@@ -23,10 +23,9 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[TestCli
         finally:
             db.close()
 
-    monkeypatch.setattr(main, "engine", engine)
-    main.app.dependency_overrides[get_db] = override_get_db
-    with TestClient(main.app) as test_client:
+    app.dependency_overrides[get_db] = override_get_db
+    with TestClient(app) as test_client:
         yield test_client
-    main.app.dependency_overrides.clear()
+    app.dependency_overrides.clear()
     Base.metadata.drop_all(bind=engine)
     engine.dispose()

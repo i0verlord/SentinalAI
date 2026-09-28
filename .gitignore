@@ -6,6 +6,13 @@ node_modules/
 **/.venv/
 __pycache__/
 *.pyc
+*.db
+.pytest_cache/
+**/.pytest_cache/
+*.tsbuildinfo
+.coverage
+coverage/
+htmlcov/
 .env
 .env.*
 !.env.example

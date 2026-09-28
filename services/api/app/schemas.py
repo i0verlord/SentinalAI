@@ -43,6 +43,8 @@ class EvidenceEvent(BaseModel):
     status_code: int | None
     raw_line: str
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class AlertDetail(AlertSummary):
     evidence: list[EvidenceEvent]

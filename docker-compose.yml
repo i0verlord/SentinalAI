@@ -1,0 +1,45 @@
+services:
+    db:
+        image: postgres:17-alpine
+        environment:
+            POSTGRES_DB: sentinelai
+            POSTGRES_USER: sentinel
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sentinel-local}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U sentinel -d sentinelai"]
+            interval: 5s
+            timeout: 3s
+            retries: 12
+
+    api:
+        build:
+            context: .
+            dockerfile: services/api/Dockerfile
+        environment:
+            DATABASE_URL: postgresql+psycopg://sentinel:${POSTGRES_PASSWORD:-sentinel-local}@db:5432/sentinelai
+            API_CORS_ORIGINS: http://localhost:3000
+            LLM_BASE_URL: ${LLM_BASE_URL:-}
+            LLM_API_KEY: ${LLM_API_KEY:-}
+            LLM_MODEL: ${LLM_MODEL:-gpt-4o-mini}
+        ports:
+            - "8000:8000"
+        depends_on:
+            db:
+                condition: service_healthy
+
+    web:
+        build:
+            context: .
+            dockerfile: apps/web/Dockerfile
+            args:
+                NEXT_PUBLIC_API_URL: http://localhost:8000/api
+        ports:
+            - "3000:3000"
+        depends_on:
+            api:
+                condition: service_healthy
+
+volumes:
+    postgres_data:

@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from types import SimpleNamespace
 
-from app.detection import aggregate_events, score_windows
+from app.detection import WindowFeatures, aggregate_events, score_windows
 
 
 def test_aggregates_http_errors_endpoints_and_ssh_failures() -> None:
@@ -23,10 +23,10 @@ def test_aggregates_http_errors_endpoints_and_ssh_failures() -> None:
 def test_sparse_traffic_flags_brute_force_window() -> None:
     start = datetime(2026, 9, 28, 10, 21, tzinfo=UTC)
     normal = [
-        SimpleNamespace(source_ip=f"192.0.2.{index}", window_start=start, event_count=3, error_rate=0, unique_endpoints=2, ssh_failures=0, requests_per_minute=3)
+        WindowFeatures(source_ip=f"192.0.2.{index}", window_start=start, event_count=3, error_rate=0, unique_endpoints=2, ssh_failures=0, requests_per_minute=3)
         for index in range(5)
     ]
-    attack = SimpleNamespace(source_ip="203.0.113.9", window_start=start, event_count=32, error_rate=100, unique_endpoints=28, ssh_failures=0, requests_per_minute=32)
+    attack = WindowFeatures(source_ip="203.0.113.9", window_start=start, event_count=32, error_rate=100, unique_endpoints=28, ssh_failures=0, requests_per_minute=32)
 
     flagged = score_windows([*normal, attack])
 

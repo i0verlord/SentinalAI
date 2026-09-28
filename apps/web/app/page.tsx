@@ -297,6 +297,7 @@ export default function Home() {
                             <Search size={14} color="#72807a" />
                             <select className="select" aria-label="Filter alerts by severity" value={severityFilter} onChange={(event) => setSeverityFilter(event.target.value)}>
                                 <option value="all">All severities</option>
+                                <option value="critical">Critical</option>
                                 <option value="high">High</option>
                                 <option value="medium">Medium</option>
                                 <option value="low">Low</option>
