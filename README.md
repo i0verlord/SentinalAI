@@ -13,15 +13,7 @@ docker compose up --build
 
 Open the dashboard at [http://localhost:3000](http://localhost:3000) and the API docs at [http://localhost:8000/docs](http://localhost:8000/docs). PostgreSQL data persists in the `postgres_data` volume. To stop the services, run `docker compose down`.
 
-## Try it
-
-- Select **Simulate traffic** to load several minutes of ordinary requests plus a directory-probing spike and SSH login failures.
-- Select **Upload logs** to ingest a `.log` or `.txt` file in Nginx access-log or Linux SSH auth-log format. The parser auto-detects each line; malformed lines are counted as skipped.
-- Select an alert row to inspect the bounded raw-evidence sample. AI triage is optional and does not block ingestion or detection.
-
-Sample files are in `samples/`. The upload endpoint accepts files up to 10 MB. The API keeps raw log lines in PostgreSQL; use synthetic or appropriately sanitized data when trying the demo.
-
-## Security and data
+## Warning!
 
 This demo has no authentication and is intended for local, trusted use only. Raw events persist in the PostgreSQL volume under Compose or in the SQLite database during local development. An LLM receives up to 20 raw lines only when triage is explicitly requested; review your provider's data-retention policy before sending sensitive logs. Suggested remediation is never executed.
 
